@@ -15,4 +15,8 @@ fn main() {
     test_str("7:le:deux-points");
     test_str("i42e");
     test_str("i-666efe");
+    test_str("le");
+    test_str("li123ei456ee");
+    test_str("l5:hello3:toie");
+    test_str("lli123ei456eel5:hello3:toiee");
 }
