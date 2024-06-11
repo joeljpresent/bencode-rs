@@ -19,4 +19,7 @@ fn main() {
     test_str("li123ei456ee");
     test_str("l5:hello3:toie");
     test_str("lli123ei456eel5:hello3:toiee");
+    test_str("de");
+    test_str("d3:ouii47e2:no0:e");
+    test_str("d3:ouili123ei456ee2:nod0:i12eee");
 }

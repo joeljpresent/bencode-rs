@@ -5,7 +5,7 @@ pub enum Value {
     String(Vec<u8>),
     Int(i64),
     List(Vec<Value>),
-    Dictionary(HashMap<String, Value>),
+    Dictionary(HashMap<Vec<u8>, Value>),
 }
 
 pub fn get_next_value(bytes: &[u8]) -> Result<(Value, &[u8]), String> {
@@ -34,13 +34,15 @@ pub fn get_next_value(bytes: &[u8]) -> Result<(Value, &[u8]), String> {
             let int: i64 = int_str.parse().or(Err("Invalid int number".to_owned()))?;
             Ok((Value::Int(int), rest))
         }
-        Some(b'l') => {
-            match parse_list(&bytes[1..]) {
-                Ok((list, rest)) => Ok((Value::List(list), rest)),
-                Err(error) => Err(error),
-            }
-        }
-        _ => Err("NON IMPLÉMENTÉ".to_owned()),
+        Some(b'l') => match parse_list(&bytes[1..]) {
+            Ok((list, rest)) => Ok((Value::List(list), rest)),
+            Err(error) => Err(error),
+        },
+        Some(b'd') => match parse_dictionary(&bytes[1..]) {
+            Ok((dict, rest)) => Ok((Value::Dictionary(dict), rest)),
+            Err(error) => Err(error),
+        },
+        _ => Err("Unknown value".to_owned()),
     }
 }
 
@@ -50,16 +52,37 @@ fn parse_list(bytes: &[u8]) -> Result<(Vec<Value>, &[u8]), String> {
     loop {
         match current.get(0) {
             Some(b'e') => return Ok((list, &current[1..])),
-            Some(_) => {
-                match get_next_value(current) {
-                    Ok((val, rest)) => {
-                        list.push(val);
-                        current = rest;
-                    },
-                    Err(error) => return Err(error),
+            Some(_) => match get_next_value(current) {
+                Ok((val, rest)) => {
+                    list.push(val);
+                    current = rest;
                 }
-            }
+                Err(error) => return Err(error),
+            },
             None => return Err("Missing list-ending e".to_owned()),
+        }
+    }
+}
+
+fn parse_dictionary(bytes: &[u8]) -> Result<(HashMap<Vec<u8>, Value>, &[u8]), String> {
+    let mut dict = HashMap::<Vec<u8>, Value>::new();
+    let mut current = bytes;
+    loop {
+        match current.get(0) {
+            Some(b'e') => return Ok((dict, &current[1..])),
+            Some(b'0'..=b'9') => match get_next_value(current) {
+                Err(error) => return Err(error),
+                Ok((Value::String(key), rest)) => match get_next_value(rest) {
+                    Ok((val, rest)) => {
+                        dict.insert(key, val);
+                        current = rest;
+                    }
+                    Err(error) => return Err(error),
+                },
+                _ => return Err("Invalid key".to_owned()),
+            },
+            Some(_) => return Err("Invalid key".to_owned()),
+            None => return Err("Missing dictionary-ending e".to_owned()),
         }
     }
 }
