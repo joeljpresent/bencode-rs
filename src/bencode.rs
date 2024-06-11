@@ -1,12 +1,6 @@
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub enum Value {
-    String(Vec<u8>),
-    Int(i64),
-    List(Vec<Value>),
-    Dictionary(HashMap<Vec<u8>, Value>),
-}
+use super::value::Value;
 
 pub fn get_next_value(bytes: &[u8]) -> Result<(Value, &[u8]), String> {
     match bytes.get(0) {

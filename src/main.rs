@@ -1,4 +1,5 @@
 mod bencode;
+mod value;
 
 use bencode::get_next_value;
 
