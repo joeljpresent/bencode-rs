@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use super::value::Value;
 
@@ -58,8 +58,8 @@ fn parse_list(bytes: &[u8]) -> Result<(Vec<Value>, &[u8]), String> {
     }
 }
 
-fn parse_dictionary(bytes: &[u8]) -> Result<(HashMap<Vec<u8>, Value>, &[u8]), String> {
-    let mut dict = HashMap::<Vec<u8>, Value>::new();
+fn parse_dictionary(bytes: &[u8]) -> Result<(BTreeMap<Vec<u8>, Value>, &[u8]), String> {
+    let mut dict = BTreeMap::<Vec<u8>, Value>::new();
     let mut current = bytes;
     loop {
         match current.get(0) {
