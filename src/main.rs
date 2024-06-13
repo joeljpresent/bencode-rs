@@ -1,10 +1,17 @@
-mod bencode;
+mod decode;
 mod value;
 
-use bencode::get_next_value;
+use decode::get_next_value;
 
 fn test_str(s: &str) {
     match get_next_value(s.as_bytes()) {
+        Ok((val, rest)) => println!("{:?} {}", val, String::from_utf8_lossy(&rest)),
+        Err(err) => println!("ERROR! {}", err),
+    }
+}
+
+fn test_bytes(s: &[u8]) {
+    match get_next_value(s) {
         Ok((val, rest)) => println!("{:?} {}", val, String::from_utf8_lossy(&rest)),
         Err(err) => println!("ERROR! {}", err),
     }
@@ -14,6 +21,7 @@ fn main() {
     test_str("0:");
     test_str("3:oui");
     test_str("7:le:deux-points");
+    test_str("26:abcdefghijklmnopqrstuvwxyz");
     test_str("i42e");
     test_str("i-666efe");
     test_str("le");
@@ -23,4 +31,5 @@ fn main() {
     test_str("de");
     test_str("d3:ouii47e2:no0:e");
     test_str("d3:ouili123ei456ee2:nod0:i12eee");
+    test_bytes(std::fs::read("sunflower.torrent").unwrap().as_ref());
 }
