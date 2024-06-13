@@ -2,7 +2,15 @@ use std::collections::BTreeMap;
 
 use super::value::Value;
 
-pub fn get_next_value(bytes: &[u8]) -> Result<(Value, &[u8]), String> {
+pub fn decode(bytes: &[u8]) -> Result<Value, String> {
+    let (val, rest) = get_next_value(bytes)?;
+    if !rest.is_empty() {
+        return Err("Unexpected character after end of data".to_owned());
+    }
+    Ok(val)
+}
+
+fn get_next_value(bytes: &[u8]) -> Result<(Value, &[u8]), String> {
     match bytes.get(0) {
         Some(b'0'..=b'9') => {
             let mut it = bytes.splitn(2, |b| *b == b':');

@@ -1,18 +1,18 @@
-mod decode;
+mod decoding;
 mod value;
 
-use decode::get_next_value;
+use decoding::decode;
 
 fn test_str(s: &str) {
-    match get_next_value(s.as_bytes()) {
-        Ok((val, rest)) => println!("{:?} {}", val, String::from_utf8_lossy(&rest)),
+    match decode(s.as_bytes()) {
+        Ok(val) => println!("{:?}", val),
         Err(err) => println!("ERROR! {}", err),
     }
 }
 
 fn test_bytes(s: &[u8]) {
-    match get_next_value(s) {
-        Ok((val, rest)) => println!("{:?} {}", val, String::from_utf8_lossy(&rest)),
+    match decode(s) {
+        Ok(val) => println!("{:?}", val),
         Err(err) => println!("ERROR! {}", err),
     }
 }
